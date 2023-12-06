@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.service.*;
 import com.example.entity.*;
@@ -93,10 +94,10 @@ public ResponseEntity<Message> getMessageById(@PathVariable Integer message_id) 
  
      // User Story 6: Delete a Message by its ID
      @DeleteMapping("/messages/{message_id}")
-public ResponseEntity<Integer> deleteMessage(@PathVariable Integer messageId) {
-    Message existingMessage = messageService.findByMessageId(messageId);
+public ResponseEntity<Integer> deleteMessage(@PathVariable Integer message_id) {
+    Message existingMessage = messageService.findByMessageId(message_id);
     if (existingMessage == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     int rowsUpdated = messageService.delete(existingMessage);
@@ -105,8 +106,9 @@ public ResponseEntity<Integer> deleteMessage(@PathVariable Integer messageId) {
  
      // User Story 7: Update a Message Text by its ID
      @PatchMapping("/messages/{message_id}")
-public ResponseEntity<Integer> updateMessage(@PathVariable Integer messageId, @RequestBody String newText) {
-    Message existingMessage = messageService.findByMessageId(messageId);
+public ResponseEntity<Integer> updateMessage(@PathVariable Integer message_id, @RequestBody Map<String, String> body) {
+    Message existingMessage = messageService.findByMessageId(message_id);
+    String newText = body.get("message_text");
     if (existingMessage == null || newText == null || newText.isEmpty() || newText.length() > 255) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -116,15 +118,16 @@ public ResponseEntity<Integer> updateMessage(@PathVariable Integer messageId, @R
     return new ResponseEntity<>(rowsUpdated, HttpStatus.OK);
 }
 
+
      // User Story 8: Retrieve All Messages Written by a Particular User
     @GetMapping("/accounts/{account_id}/messages")
-    public ResponseEntity<List<Message>> getMessagesByUser(@PathVariable Integer accountId) {
-        Account existingAccount = accountService.findByAccountId(accountId);
+    public ResponseEntity<List<Message>> getMessagesByUser(@PathVariable Integer account_id) {
+        Account existingAccount = accountService.findByAccountId(account_id);
         if (existingAccount == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        List<Message> messages = messageService.findByPostedBy(accountId);
+        List<Message> messages = messageService.findByPostedBy(account_id);
         return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 }
